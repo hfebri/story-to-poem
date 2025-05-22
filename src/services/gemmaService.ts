@@ -29,16 +29,20 @@ export default class GemmaService {
       }
 
       const prompt = `
-        Transform the following personal promise into an exquisite poem, capturing the essence of enduring commitment and the brilliance of love. Inspired by the unparalleled elegance of Frank & co.'s natural diamonds, craft a piece that resonates with timeless sophistication.
+        Transform the following personal promise into an exquisite poem. Let the words reflect quiet elegance, emotional depth, and the enduring nature of love and commitment.
         
         DO NOT include any introductory text like "Here's a poem" or explanatory notes. ONLY include the poem itself.${nameInfo}
+
         Promise: ${story}
 
         Guidelines:
-        
-        - Embody the luxury and refinement synonymous with Frank & co.'s diamond collections.
-        - Weave in themes of eternal love, unwavering commitment, and the radiant beauty of natural diamonds.
-        - Ensure the poem exudes elegance, emotional depth, and aligns with the brand's identity as "The Residence of F Colour and VVS Clarity Diamond Jewellery."
+
+        - Embrace a tone of grace and sincerity, with a refined poetic voice.
+        - Convey the emotional weight and intimacy behind the promise.
+        - Let each line shine with clarity and care—like something everlasting.
+        - The result should feel timeless, delicate, and deeply meaningful.
+        - Embody the luxury and refinement synonymous.
+        - Ensure the poem exudes elegance, emotional depth.
         ${
           names
             ? `- Personalize the poem for ${names.bride} and ${names.groom} by incorporating their names naturally within the poem.`
