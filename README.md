@@ -74,6 +74,72 @@ This application requires a Gemma 3 API key to work. Follow these steps to set i
 
 **Important**: Never commit your `.env` file to version control.
 
+## Running the Application
+
+### Development Mode
+
+This application consists of two parts that need to run simultaneously: the frontend React application and the backend server that handles API calls to Google's AI models.
+
+#### Step 1: Start the Backend Server
+
+1. Open a terminal window in the project root directory and run:
+
+   ```bash
+   node server.js
+   ```
+
+   This will start the proxy server at http://localhost:3000. You should see a message:
+
+   ```
+   Proxy server running at http://localhost:3000
+   ```
+
+   Alternatively, you can use the server in the server directory which has more detailed logging:
+
+   ```bash
+   cd server
+   node server.js
+   ```
+
+#### Step 2: Start the Frontend Application
+
+1. Open a new terminal window in the project root directory and run:
+
+   ```bash
+   npm run dev
+   ```
+
+2. This will start the Vite development server, typically at http://localhost:5173. You can access the application in your browser at this address.
+
+### Production Mode
+
+For production deployment:
+
+1. Build the frontend application:
+
+   ```bash
+   npm run build
+   ```
+
+   This creates optimized production files in the `dist` directory.
+
+2. To preview the production build locally:
+
+   ```bash
+   npm run preview
+   ```
+
+3. For actual deployment, you'll need to:
+   - Deploy the backend server (server.js) to a Node.js hosting environment
+   - Deploy the frontend static files (from the `dist` directory) to a static hosting service
+   - Ensure the frontend is configured to connect to your deployed backend URL
+
+## Troubleshooting
+
+- **API Key Issues**: If you encounter errors about the API key, ensure it's correctly set in the .env file and that you have access to the Gemma models.
+- **Server Connection Errors**: Make sure the server is running at http://localhost:3000 before using the frontend application.
+- **CORS Issues**: If you experience CORS errors, verify that the server is properly configured to allow requests from the frontend domain.
+
 ## Development
 
 To build for production:
