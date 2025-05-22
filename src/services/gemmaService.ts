@@ -2,7 +2,10 @@ import axios from "axios";
 
 // Gemma API service for transforming stories to poems
 export default class GemmaService {
-  private proxyUrl: string = "http://localhost:3000/api/generate-poem";
+  // Dynamic API URL that works both in development and production
+  private proxyUrl: string = import.meta.env.PROD
+    ? "/api/generate-poem"
+    : "http://localhost:3000/api/generate-poem";
 
   // We just need to validate that an API key was provided, but don't use it directly
   constructor() {

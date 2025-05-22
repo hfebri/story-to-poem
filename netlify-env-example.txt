@@ -1,0 +1,3 @@
+# This file serves as a template for environment variables
+# Do NOT add your real API key here - set it in Netlify dashboard
+VITE_GEMMA_API_KEY=your_api_key_will_be_set_in_netlify_dashboard 
