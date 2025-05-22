@@ -17,6 +17,13 @@ const NameInputForm = ({ onSubmit, onBack, role }: NameInputFormProps) => {
     }
   };
 
+  // Add a function to handle back navigation
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    }
+  };
+
   return (
     <div className="w-full max-w-[345px] mx-auto">
       <div className="text-center mb-8">
@@ -71,7 +78,17 @@ const NameInputForm = ({ onSubmit, onBack, role }: NameInputFormProps) => {
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center space-x-4">
+          {onBack && (
+            <button
+              type="button"
+              onClick={handleBack}
+              className="px-5 py-2.5 text-[#873053] border border-[#873053] font-bold rounded-full text-center hover:bg-[#873053] hover:text-white focus:outline-none"
+              style={{ fontFamily: "Cinzel, serif" }}
+            >
+              Back
+            </button>
+          )}
           <button
             type="submit"
             disabled={!brideFullName.trim() || !groomFullName.trim()}

@@ -44,7 +44,7 @@ function App() {
   useEffect(() => {
     if (config.gemmaApiKey) {
       try {
-        setGemmaService(new GemmaService(config.gemmaApiKey));
+        setGemmaService(new GemmaService());
         setError(null);
       } catch (err) {
         setError(
