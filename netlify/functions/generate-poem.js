@@ -1,9 +1,9 @@
-import axios from "axios";
+const axios = require("axios");
 
 // List of models to try in order of preference
 const API_MODELS = ["models/gemma-3-27b-it", "models/gemma-3-12b-it"];
 
-export const handler = async (event) => {
+exports.handler = async (event) => {
   // Only allow POST requests
   if (event.httpMethod !== "POST") {
     return {

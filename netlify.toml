@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build && cd netlify/functions && npm install"
   publish = "dist"
   functions = "netlify/functions"
 
@@ -15,4 +15,8 @@
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
+
+# Function specific settings
+[functions]
+  node_bundler = "esbuild" 
