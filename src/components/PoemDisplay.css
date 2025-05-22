@@ -1,0 +1,30 @@
+.poem-container {
+  font-family: "Georgia", serif;
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.poem-content {
+  color: #333;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.poem-content p {
+  margin-bottom: 1.5em;
+}
+
+.poem-content strong {
+  color: #873053;
+}
+
+/* Add some animation for the poem appearance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
