@@ -59,7 +59,7 @@ const BrideGroomSelect = ({ onSelect }: BrideGroomSelectProps) => {
                 style={{ height: "398px" }}
               >
                 <img
-                  src="/bride_image.png"
+                  src="/images/bride_image.png"
                   alt="Bride"
                   className="w-full h-full object-cover object-center"
                   style={{ objectPosition: "center" }}
@@ -88,7 +88,7 @@ const BrideGroomSelect = ({ onSelect }: BrideGroomSelectProps) => {
                 style={{ height: "398px" }}
               >
                 <img
-                  src="/groom_image.png"
+                  src="/images/groom_image.png"
                   alt="Groom"
                   className="w-full h-full object-cover object-center scale-x-[-1]"
                   style={{ objectPosition: "center" }}

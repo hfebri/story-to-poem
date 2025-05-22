@@ -18,21 +18,21 @@ const NavigationProgress: React.FC<NavigationProgressProps> = ({
             {index + 1 === currentStep ? (
               // Current step - larger star
               <img
-                src="/star-fill.svg"
+                src="/icons/star-fill.svg"
                 alt="Current step"
                 className="w-4 h-4"
               />
             ) : index < currentStep ? (
               // Completed step
               <img
-                src="/star-fill.svg"
+                src="/icons/star-fill.svg"
                 alt="Completed step"
                 className="w-3 h-3"
               />
             ) : (
               // Upcoming step
               <img
-                src="/star-no-fill.svg"
+                src="/icons/star-no-fill.svg"
                 alt="Upcoming step"
                 className="w-3 h-3"
               />
@@ -42,7 +42,7 @@ const NavigationProgress: React.FC<NavigationProgressProps> = ({
           {/* Line element (only between stars, not after the last star) */}
           {index < totalSteps - 1 && (
             <div className="flex-grow flex items-center">
-              <img src="/line.svg" alt="-" className="w-full" />
+              <img src="/icons/line.svg" alt="-" className="w-full" />
             </div>
           )}
         </React.Fragment>
