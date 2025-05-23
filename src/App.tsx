@@ -6,6 +6,7 @@ import BrideGroomSelect from "./components/BrideGroomSelect";
 import NavigationProgress from "./components/NavigationProgress";
 import NameInputForm from "./components/NameInputForm";
 import BackArrow from "./components/BackArrow";
+import BackgroundMusic from "./components/BackgroundMusic";
 import GemmaService from "./services/gemmaService";
 import { config, apiKeyInstructions } from "./config";
 
@@ -200,67 +201,49 @@ function App() {
     }
   };
 
-  // Determine background class based on current step
   const getBackgroundClass = () => {
-    return step === "selection" ? "bg-selection-page" : "bg-page";
+    return "bg-page";
   };
 
-  // Determine if back button should be shown
   const showBackButton = () => {
-    return step !== "selection" && step !== "poem";
+    return step !== "selection";
   };
 
   return (
-    <div className="container mx-auto max-w-md">
-      <div
-        className={`${getBackgroundClass()} min-h-screen w-full flex flex-col p-4 relative`}
+    <div className={`min-h-screen w-full ${getBackgroundClass()}`}>
+      {/* Background Music Component */}
+      <BackgroundMusic />
+
+      {/* Error display if needed */}
+      {error && (
+        <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-red-100 border-b border-red-400 text-red-700 text-center">
+          {error}
+        </div>
+      )}
+
+      {/* Header with Navigation Progress */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-10 p-4 transition-all duration-300 ${
+          isScrolled ? "bg-white bg-opacity-80 shadow-md" : ""
+        }`}
       >
-        {/* Navigation at the top with integrated back arrow */}
-        <div
-          className={`sticky top-0 pt-4 pb-6 z-10 transition-all duration-300 ${
-            isScrolled
-              ? "bg-white/70 backdrop-blur-md shadow-sm"
-              : "bg-transparent"
-          }`}
-        >
-          <div className="flex items-center w-full">
-            {/* Back arrow on the left */}
-            <div className="w-8">
-              {showBackButton() && <BackArrow onBack={handleBack} />}
-            </div>
-
-            {/* Navigation progress in the center */}
-            <div className="flex-1">
-              <NavigationProgress
-                currentStep={getCurrentStepNumber()}
-                totalSteps={4}
-              />
-            </div>
-
-            {/* Empty space on the right to balance the layout */}
-            <div className="w-8"></div>
-          </div>
+        <div className="container mx-auto flex justify-center items-center">
+          <NavigationProgress
+            currentStep={getCurrentStepNumber()}
+            totalSteps={4}
+          />
         </div>
+      </header>
 
-        {/* Main content area with justify-between layout */}
-        <div className="flex-grow flex flex-col justify-between">
-          <div className="flex items-center justify-center">
-            <div className="w-full max-w-sm p-6 rounded-lg">
-              {renderContent()}
-            </div>
-          </div>
-
-          {/* Empty div to balance layout */}
-          <div className="h-16"></div>
-        </div>
-
-        {/* Error display at the bottom if needed */}
-        {error && (
-          <div className="w-full mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {error}
+      {/* Main Content */}
+      <main className="container mx-auto pt-24 px-4 pb-16 flex flex-col items-center">
+        {showBackButton() && (
+          <div className="self-start mb-6">
+            <BackArrow onBack={handleBack} />
           </div>
         )}
-      </div>
+        {renderContent()}
+      </main>
     </div>
   );
 }
