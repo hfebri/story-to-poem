@@ -202,7 +202,7 @@ function App() {
   };
 
   const getBackgroundClass = () => {
-    return "bg-page";
+    return step === "selection" ? "bg-selection-page" : "bg-page";
   };
 
   const showBackButton = () => {
