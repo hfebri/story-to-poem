@@ -154,6 +154,46 @@ To preview the production build:
 npm run preview
 ```
 
+## Local Development
+
+To run this application locally, you need to:
+
+1. Create a `.env` file in the root directory:
+
+   ```
+   # Copy the template
+   cp env-example.txt .env
+
+   # Edit the .env file and add your Gemma API key
+   ```
+
+2. Install the dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Install the concurrently package for running multiple servers:
+
+   ```bash
+   npm install --save-dev concurrently
+   ```
+
+4. Run both the frontend and backend servers:
+   ```bash
+   npm run dev:all
+   ```
+
+This will start:
+
+- The React development server on port 5173 (http://localhost:5173)
+- The Express API server on port 3000 (http://localhost:3000)
+
+You can also run them separately:
+
+- Frontend only: `npm run dev`
+- Backend only: `npm run dev:server`
+
 ## License
 
 MIT

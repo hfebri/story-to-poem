@@ -32,26 +32,27 @@ export default class GemmaService {
       }
 
       const prompt = `
-        Transform the following personal promise into an exquisite poem. Let the words reflect quiet elegance, emotional depth, and the enduring nature of love and commitment.
-        
-        DO NOT include any introductory text like "Here's a poem" or explanatory notes. ONLY include the poem itself.${nameInfo}
+        Transform the following personal promise into a graceful haiku.
+        Let the poem reflect quiet elegance, emotional depth, and a sense of timeless commitment.
 
         Promise: ${story}
 
-        Guidelines:
+        Format:
+        - Haiku
+        - 3 lines
+        - 5-7-5 syllables
+        - No titles, no explanations, no follow-up.
+        - No introduction. No explanation. No outro. Only the haiku.
 
-        - Embrace a tone of grace and sincerity, with a refined poetic voice.
-        - Convey the emotional weight and intimacy behind the promise.
-        - Let each line shine with clarity and care—like something everlasting.
-        - The result should feel timeless, delicate, and deeply meaningful.
-        - Embody the luxury and refinement synonymous.
-        - Ensure the poem exudes elegance, emotional depth.
-        ${
-          names
-            ? `- Personalize the poem for ${names.bride} and ${names.groom} by incorporating their names naturally within the poem.`
-            : ""
-        }
-      `;
+        Guidelines: 
+        - The poem should be a single haiku, not a list of haikus.
+        - Only output the haiku—no titles, no explanations, no follow-up.
+        - Follow the traditional haiku structure: 3 lines with 5-7-5 syllables.
+        - Evoke a sense of stillness, sincerity, and permanence—like a promise set in stone.
+        - Keep the tone delicate, refined, and emotionally evocative.
+        - Let each word carry the weight of love, memory, and beauty.
+        - The poem should be in the style of a traditional haiku, not a modern poem.
+        - No introduction. No explanation. No outro. Only the haiku.`;
 
       const response = await axios.post(this.proxyUrl, { prompt });
 

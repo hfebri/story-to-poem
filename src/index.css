@@ -23,15 +23,13 @@
 @layer components {
   .bg-page {
     background-image: url("/backgrounds/page-background.png");
-    background-size: contain;
+    background-size: cover;
     background-position: center;
-    background-attachment: fixed;
   }
 
   .bg-selection-page {
     background-image: url("/backgrounds/background.png");
-    background-size: contain;
+    background-size: cover;
     background-position: center;
-    background-attachment: fixed;
   }
 }
