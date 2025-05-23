@@ -210,40 +210,45 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen w-full ${getBackgroundClass()}`}>
-      {/* Background Music Component */}
-      <BackgroundMusic />
+    <div className="container mx-auto max-w-md">
+      <div className={`min-h-screen w-full ${getBackgroundClass()}`}>
+        {/* Background Music Component */}
+        <BackgroundMusic />
 
-      {/* Error display if needed */}
-      {error && (
-        <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-red-100 border-b border-red-400 text-red-700 text-center">
-          {error}
-        </div>
-      )}
-
-      {/* Header with Navigation Progress */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-10 p-4 transition-all duration-300 ${
-          isScrolled ? "bg-white bg-opacity-80 shadow-md" : ""
-        }`}
-      >
-        <div className="container mx-auto flex justify-center items-center">
-          <NavigationProgress
-            currentStep={getCurrentStepNumber()}
-            totalSteps={4}
-          />
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto pt-24 px-4 pb-16 flex flex-col items-center">
-        {showBackButton() && (
-          <div className="self-start mb-6">
-            <BackArrow onBack={handleBack} />
+        {/* Error display if needed */}
+        {error && (
+          <div className="fixed top-0 left-0 right-0 z-50 p-4 bg-red-100 border-b border-red-400 text-red-700 text-center">
+            {error}
           </div>
         )}
-        {renderContent()}
-      </main>
+
+        {/* Header with Navigation Progress and Back Arrow */}
+        <header
+          className={`fixed top-0 left-1/2 transform -translate-x-1/2 z-10 p-4 transition-all duration-300 w-full max-w-md ${
+            isScrolled ? "bg-white bg-opacity-80 shadow-md" : ""
+          }`}
+        >
+          <div className="relative">
+            {/* Back Arrow positioned on the left */}
+            {showBackButton() && (
+              <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
+                <BackArrow onBack={handleBack} />
+              </div>
+            )}
+
+            {/* Navigation Progress centered */}
+            <NavigationProgress
+              currentStep={getCurrentStepNumber()}
+              totalSteps={4}
+            />
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="pt-24 px-4 pb-16 flex flex-col items-center">
+          {renderContent()}
+        </main>
+      </div>
     </div>
   );
 }
