@@ -6,7 +6,7 @@ echo "Starting build process..."
 
 # Install dependencies for the main project
 echo "Installing main project dependencies..."
-npm ci
+npm install
 
 # Build the frontend
 echo "Building frontend..."
@@ -16,7 +16,7 @@ npm run build
 if [ -d "netlify/functions" ]; then
   echo "Installing function dependencies..."
   cd netlify/functions
-  npm ci
+  npm install
   cd ../..
 fi
 
