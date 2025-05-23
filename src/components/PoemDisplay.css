@@ -17,6 +17,47 @@
   color: #873053;
 }
 
+/* Poem formatting options */
+
+/* Option 1: Pre tag styling */
+.poem-pre-formatted {
+  display: none; /* Hidden by default, enable if needed */
+  font-family: "Georgia", serif;
+  white-space: pre-wrap;
+  background: transparent;
+  border: none;
+  font-size: 1em;
+  line-height: 1.8;
+  color: #333;
+  text-align: center;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Option 2: Line by line formatting */
+.poem-lines-container {
+  font-family: "Georgia", serif;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  letter-spacing: 0.01em;
+}
+
+.poem-line {
+  margin-bottom: 0.5em;
+  line-height: 1.6;
+  font-size: 1.1em;
+}
+
+.poem-stanza-break {
+  height: 1.5em;
+}
+
+/* Special typography */
+.poem-line:first-letter {
+  font-size: 1.05em;
+}
+
 /* Add some animation for the poem appearance */
 @keyframes fadeIn {
   from {
@@ -26,5 +67,16 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .poem-lines-container {
+    padding: 0 0.5rem;
+  }
+
+  .poem-line {
+    font-size: 1em;
   }
 }

@@ -1,7 +1,5 @@
 import { useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import "./PoemDisplay.css"; // We'll create this CSS file
+import "./PoemDisplay.css";
 
 type PoemDisplayProps = {
   poem: string | null;
@@ -41,6 +39,15 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
     }
   };
 
+  // Pre-process the poem to ensure proper formatting
+  const formattedPoem = poem
+    // Replace explicit newline characters with actual line breaks
+    .replace(/\\n/g, "\n")
+    // Ensure consistent line breaks
+    .split("\n")
+    .map((line) => line.trim())
+    .join("\n");
+
   return (
     <div className="w-full">
       <div className="mb-6 text-center">
@@ -73,51 +80,21 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
             <div className="w-24 h-1 bg-[#ECDFE4] mx-auto mt-2 mb-4 rounded-full"></div>
           </div>
         )}
+
         <div className="text-black leading-relaxed poem-content">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              // Custom styling for each markdown element
-              h1: ({ ...props }) => (
-                <h1
-                  className="text-xl font-semibold mb-3 text-center text-[#873053]"
-                  {...props}
-                />
-              ),
-              h2: ({ ...props }) => (
-                <h2
-                  className="text-lg font-medium mb-2 text-[#873053]"
-                  {...props}
-                />
-              ),
-              h3: ({ ...props }) => (
-                <h3
-                  className="text-base font-medium mb-2 text-[#873053]"
-                  {...props}
-                />
-              ),
-              strong: ({ ...props }) => (
-                <strong className="font-semibold text-[#873053]" {...props} />
-              ),
-              em: ({ ...props }) => (
-                <em className="italic text-gray-700" {...props} />
-              ),
-              p: ({ ...props }) => (
-                <p className="mb-4 leading-relaxed" {...props} />
-              ),
-              hr: ({ ...props }) => (
-                <hr className="my-4 border-t border-[#ECDFE4]" {...props} />
-              ),
-              blockquote: ({ ...props }) => (
-                <blockquote
-                  className="pl-4 border-l-4 border-[#ECDFE4] italic text-gray-700 my-4"
-                  {...props}
-                />
-              ),
-            }}
-          >
-            {poem}
-          </ReactMarkdown>
+          {/* Using custom formatting with line breaks */}
+          <div className="poem-lines-container">
+            {formattedPoem.split("\n").map((line, index) => (
+              <div
+                key={index}
+                className={`poem-line ${
+                  !line.trim() ? "poem-stanza-break" : ""
+                }`}
+              >
+                {line || "\u00A0"}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
