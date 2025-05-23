@@ -2,6 +2,7 @@
   "name": "story-to-poem-functions",
   "version": "1.0.0",
   "dependencies": {
-    "axios": "^1.9.0"
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0"
   }
 }
