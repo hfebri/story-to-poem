@@ -23,18 +23,18 @@ export default class GemmaService {
     names?: { bride: string; groom: string }
   ): Promise<string> {
     try {
-      // Create name information if provided
-      let nameInfo = "";
+      // Build the prompt based on whether names are provided
+      let personalizationContext = "";
       if (names && (names.bride || names.groom)) {
-        nameInfo = `\nNames: ${names.bride || "Bride"} and ${
-          names.groom || "Groom"
-        }\n`;
+        personalizationContext = `This is for ${names.bride || "a bride"} and ${
+          names.groom || "a groom"
+        }. `;
       }
 
       const prompt = `
         Transform the following personal promise into a graceful haiku.
         Let the poem reflect quiet elegance, emotional depth, and a sense of timeless commitment.
-
+        ${personalizationContext}
         Promise: ${story}
 
         Format:
