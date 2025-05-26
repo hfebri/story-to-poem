@@ -21,25 +21,95 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
     try {
       setDownloading(true);
 
-      // Load the background image first
-      const backgroundImg = new Image();
-      backgroundImg.crossOrigin = "anonymous";
+      // Test background image accessibility
+      const testImageAccess = async (url: string): Promise<boolean> => {
+        try {
+          const response = await fetch(url, { method: "HEAD" });
+          console.log(`Image accessibility test for ${url}:`, response.status);
+          return response.ok;
+        } catch (error) {
+          console.error(`Failed to test image access for ${url}:`, error);
+          return false;
+        }
+      };
 
+      // Load the background image first
       const loadBackgroundImage = () => {
         return new Promise<HTMLImageElement>((resolve, reject) => {
-          backgroundImg.onload = () => {
-            console.log(
-              "Background image loaded successfully",
-              backgroundImg.width,
-              backgroundImg.height
-            );
-            resolve(backgroundImg);
+          const tryLoadImage = (src: string, useCORS: boolean = true) => {
+            const img = new Image();
+            if (useCORS) {
+              img.crossOrigin = "anonymous";
+            }
+
+            img.onload = () => {
+              console.log(
+                "Background image loaded successfully",
+                img.width,
+                img.height
+              );
+              console.log("Image src:", img.src);
+              console.log("CORS enabled:", useCORS);
+              resolve(img);
+            };
+
+            img.onerror = (error) => {
+              console.error("Failed to load background image:", error);
+              console.error("Attempted image src:", img.src);
+              console.error("CORS enabled:", useCORS);
+
+              if (useCORS) {
+                console.log("Retrying without CORS...");
+                tryLoadImage(src, false);
+                return;
+              }
+
+              // Try alternative paths as fallbacks
+              const fallbackPaths = [
+                "./backgrounds/page-background.png",
+                "backgrounds/page-background.png",
+                `${window.location.origin}/backgrounds/page-background.png`,
+              ];
+
+              let fallbackIndex = 0;
+              const tryFallback = () => {
+                if (fallbackIndex < fallbackPaths.length) {
+                  console.log(
+                    `Trying fallback path ${fallbackIndex + 1}:`,
+                    fallbackPaths[fallbackIndex]
+                  );
+                  tryLoadImage(fallbackPaths[fallbackIndex], false);
+                  fallbackIndex++;
+                } else {
+                  console.error("All fallback paths failed");
+                  reject(new Error("All image loading attempts failed"));
+                }
+              };
+
+              tryFallback();
+            };
+
+            img.src = src;
           };
-          backgroundImg.onerror = (error) => {
-            console.error("Failed to load background image:", error);
-            reject(error);
-          };
-          backgroundImg.src = "/backgrounds/page-background.png";
+
+          // Test accessibility first, then try to load
+          const primaryPath = "/backgrounds/page-background.png";
+          console.log("Testing image accessibility...");
+          testImageAccess(primaryPath)
+            .then((accessible) => {
+              console.log("Image accessible via fetch:", accessible);
+              console.log(
+                "Attempting to load background image from:",
+                primaryPath
+              );
+              tryLoadImage(primaryPath);
+            })
+            .catch(() => {
+              console.log(
+                "Fetch test failed, proceeding with image load anyway..."
+              );
+              tryLoadImage(primaryPath);
+            });
         });
       };
 
@@ -89,10 +159,20 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
 
       document.body.appendChild(tempDiv);
 
-      const contentCanvas = await html2canvas(tempDiv, {
-        useCORS: true,
-        allowTaint: false,
-      });
+      let contentCanvas: HTMLCanvasElement;
+      try {
+        contentCanvas = await html2canvas(tempDiv, {
+          useCORS: true,
+          allowTaint: false,
+        });
+      } catch (error) {
+        console.error("html2canvas failed:", error);
+        throw new Error(
+          `html2canvas failed: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+      }
 
       document.body.removeChild(tempDiv);
 
@@ -101,6 +181,11 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
         contentCanvas.width,
         contentCanvas.height
       );
+
+      // Additional debugging for Netlify
+      console.log("User agent:", navigator.userAgent);
+      console.log("Current domain:", window.location.hostname);
+      console.log("Protocol:", window.location.protocol);
 
       // Function to draw rounded rectangle
       const drawRoundedRect = (
