@@ -21,11 +21,113 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
     try {
       setDownloading(true);
 
-      // Create canvas from the poem container
-      const poemCanvas = await html2canvas(poemRef.current, {
+      // Load the background image first
+      const backgroundImg = new Image();
+      backgroundImg.crossOrigin = "anonymous";
+
+      const loadBackgroundImage = () => {
+        return new Promise<HTMLImageElement>((resolve, reject) => {
+          backgroundImg.onload = () => {
+            console.log(
+              "Background image loaded successfully",
+              backgroundImg.width,
+              backgroundImg.height
+            );
+            resolve(backgroundImg);
+          };
+          backgroundImg.onerror = (error) => {
+            console.error("Failed to load background image:", error);
+            reject(error);
+          };
+          backgroundImg.src = "/backgrounds/page-background.png";
+        });
+      };
+
+      // Load background image
+      const bgImage = await loadBackgroundImage();
+
+      // Create canvas from the poem container content only (without border styling)
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = poemRef.current.innerHTML;
+      tempDiv.style.fontFamily = "Georgia, serif";
+      tempDiv.style.color = "#333";
+      tempDiv.style.padding = "60px";
+      tempDiv.style.textAlign = "center";
+      tempDiv.style.backgroundColor = "transparent";
+      tempDiv.style.width = "600px"; // Larger size for better text quality
+      tempDiv.style.minHeight = "400px";
+      tempDiv.style.display = "flex";
+      tempDiv.style.flexDirection = "column";
+      tempDiv.style.justifyContent = "center";
+      tempDiv.style.fontSize = "24px"; // Larger font size
+      tempDiv.style.lineHeight = "1.6";
+
+      // Fix divider line styling in the temporary div
+      const dividerElements = tempDiv.querySelectorAll("div");
+      dividerElements.forEach((el) => {
+        if (
+          el.classList.contains("w-12") ||
+          el.style.width ||
+          el.style.height
+        ) {
+          el.style.width = "60px";
+          el.style.height = "2px";
+          el.style.backgroundColor = "#ECDFE4";
+          el.style.margin = "16px auto 24px auto";
+        }
+      });
+
+      // Style the "For" text specifically
+      const forText = tempDiv.querySelector("h2");
+      if (forText) {
+        forText.style.fontSize = "28px";
+        forText.style.fontWeight = "500";
+        forText.style.color = "#873053";
+        forText.style.marginBottom = "16px";
+        forText.style.fontFamily = "Cinzel, serif";
+      }
+
+      document.body.appendChild(tempDiv);
+
+      const contentCanvas = await html2canvas(tempDiv, {
         useCORS: true,
         allowTaint: false,
       });
+
+      document.body.removeChild(tempDiv);
+
+      console.log(
+        "Content canvas created:",
+        contentCanvas.width,
+        contentCanvas.height
+      );
+
+      // Function to draw rounded rectangle
+      const drawRoundedRect = (
+        ctx: CanvasRenderingContext2D,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        radius: number
+      ) => {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(
+          x + width,
+          y + height,
+          x + width - radius,
+          y + height
+        );
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      };
 
       // Create a new canvas for the final composition
       const finalCanvas = document.createElement("canvas");
@@ -33,54 +135,103 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
 
       if (!ctx) throw new Error("Could not get canvas context");
 
-      // Load the background image
-      const backgroundImg = new Image();
-      backgroundImg.crossOrigin = "anonymous";
+      // Set canvas size to background image size
+      finalCanvas.width = bgImage.width;
+      finalCanvas.height = bgImage.height;
 
-      backgroundImg.onload = () => {
-        // Set canvas size to background image size
-        finalCanvas.width = backgroundImg.width;
-        finalCanvas.height = backgroundImg.height;
+      console.log("Final canvas size:", finalCanvas.width, finalCanvas.height);
 
-        // Draw background
-        ctx.drawImage(backgroundImg, 0, 0);
+      // Draw background
+      ctx.drawImage(bgImage, 0, 0);
 
-        // Calculate position to center the poem content
-        const poemX = (backgroundImg.width - poemCanvas.width) / 2;
-        const poemY = (backgroundImg.height - poemCanvas.height) / 2;
+      // Calculate poem container dimensions and position
+      const containerWidth = Math.min(600, bgImage.width - 60); // Larger container
+      const containerHeight = Math.min(500, bgImage.height - 100);
+      const containerX = (bgImage.width - containerWidth) / 2;
+      const containerY = (bgImage.height - containerHeight) / 2;
 
-        // Draw poem content on top
-        ctx.drawImage(poemCanvas, poemX, poemY);
+      // Draw rounded rectangle background
+      ctx.save();
+      drawRoundedRect(
+        ctx,
+        containerX,
+        containerY,
+        containerWidth,
+        containerHeight,
+        28
+      );
+      ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+      ctx.fill();
 
-        // Convert final canvas to blob and download
-        finalCanvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
+      // Draw border
+      ctx.strokeStyle = "#ECDFE4";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
 
-            // Generate filename with names if available
-            const filename =
-              names && (names.bride || names.groom)
-                ? `poem-${names.bride.replace(
-                    /\s+/g,
-                    "-"
-                  )}-${names.groom.replace(/\s+/g, "-")}.png`
-                : "wedding-poem.png";
+      // Calculate content position within the rounded container
+      const contentScale = Math.min(
+        (containerWidth - 40) / contentCanvas.width, // Less padding for more space
+        (containerHeight - 40) / contentCanvas.height,
+        0.8 // Max scale to ensure readability
+      );
 
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-          }
-          setDownloading(false);
-        }, "image/png");
-      };
+      const scaledContentWidth = contentCanvas.width * contentScale;
+      const scaledContentHeight = contentCanvas.height * contentScale;
+      const contentX = containerX + (containerWidth - scaledContentWidth) / 2;
+      const contentY = containerY + (containerHeight - scaledContentHeight) / 2;
 
-      backgroundImg.onerror = () => {
-        console.error("Failed to load background image");
-        // Fallback to original method without background
+      console.log(
+        "Content position:",
+        contentX,
+        contentY,
+        "Scale:",
+        contentScale
+      );
+
+      // Draw content on top
+      ctx.drawImage(
+        contentCanvas,
+        contentX,
+        contentY,
+        scaledContentWidth,
+        scaledContentHeight
+      );
+
+      // Convert final canvas to blob and download
+      finalCanvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+
+          // Generate filename with names if available
+          const filename =
+            names && (names.bride || names.groom)
+              ? `poem-${names.bride.replace(/\s+/g, "-")}-${names.groom.replace(
+                  /\s+/g,
+                  "-"
+                )}.png`
+              : "wedding-poem.png";
+
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          console.log("Download completed successfully");
+        }
+      }, "image/png");
+    } catch (err) {
+      console.error("Failed to download image: ", err);
+
+      // Fallback: download poem without background
+      try {
+        const poemCanvas = await html2canvas(poemRef.current, {
+          useCORS: true,
+          allowTaint: false,
+        });
+
         poemCanvas.toBlob((blob) => {
           if (blob) {
             const url = URL.createObjectURL(blob);
@@ -99,15 +250,12 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
           }
-          setDownloading(false);
         }, "image/png");
-      };
-
-      // Load the background image
-      backgroundImg.src = "/backgrounds/background.png";
-    } catch (err) {
-      console.error("Failed to download image: ", err);
-      alert("Failed to download image");
+      } catch (fallbackErr) {
+        console.error("Fallback download also failed:", fallbackErr);
+        alert("Failed to download image");
+      }
+    } finally {
       setDownloading(false);
     }
   };
@@ -160,6 +308,7 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
+          margin: "20px",
         }}
       >
         {names && (names.bride || names.groom) && (
@@ -170,7 +319,7 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
             >
               For {names.bride} & {names.groom}
             </h2>
-            <div className="w-16 h-0.5 bg-[#ECDFE4] mx-auto mt-3 mb-6 rounded-full"></div>
+            <div className="w-12 h-px bg-[#ECDFE4] mx-auto mt-2 mb-5"></div>
           </div>
         )}
 
