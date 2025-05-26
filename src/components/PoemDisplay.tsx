@@ -22,39 +22,92 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
       setDownloading(true);
 
       // Create canvas from the poem container
-      const canvas = await html2canvas(poemRef.current, {
+      const poemCanvas = await html2canvas(poemRef.current, {
         useCORS: true,
         allowTaint: false,
       });
 
-      // Convert canvas to blob
-      canvas.toBlob((blob) => {
-        if (blob) {
-          // Create download link
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
+      // Create a new canvas for the final composition
+      const finalCanvas = document.createElement("canvas");
+      const ctx = finalCanvas.getContext("2d");
 
-          // Generate filename with names if available
-          const filename =
-            names && (names.bride || names.groom)
-              ? `poem-${names.bride.replace(/\s+/g, "-")}-${names.groom.replace(
-                  /\s+/g,
-                  "-"
-                )}.png`
-              : "wedding-poem.png";
+      if (!ctx) throw new Error("Could not get canvas context");
 
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }
-      }, "image/png");
+      // Load the background image
+      const backgroundImg = new Image();
+      backgroundImg.crossOrigin = "anonymous";
+
+      backgroundImg.onload = () => {
+        // Set canvas size to background image size
+        finalCanvas.width = backgroundImg.width;
+        finalCanvas.height = backgroundImg.height;
+
+        // Draw background
+        ctx.drawImage(backgroundImg, 0, 0);
+
+        // Calculate position to center the poem content
+        const poemX = (backgroundImg.width - poemCanvas.width) / 2;
+        const poemY = (backgroundImg.height - poemCanvas.height) / 2;
+
+        // Draw poem content on top
+        ctx.drawImage(poemCanvas, poemX, poemY);
+
+        // Convert final canvas to blob and download
+        finalCanvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+
+            // Generate filename with names if available
+            const filename =
+              names && (names.bride || names.groom)
+                ? `poem-${names.bride.replace(
+                    /\s+/g,
+                    "-"
+                  )}-${names.groom.replace(/\s+/g, "-")}.png`
+                : "wedding-poem.png";
+
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+          }
+          setDownloading(false);
+        }, "image/png");
+      };
+
+      backgroundImg.onerror = () => {
+        console.error("Failed to load background image");
+        // Fallback to original method without background
+        poemCanvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const filename =
+              names && (names.bride || names.groom)
+                ? `poem-${names.bride.replace(
+                    /\s+/g,
+                    "-"
+                  )}-${names.groom.replace(/\s+/g, "-")}.png`
+                : "wedding-poem.png";
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+          }
+          setDownloading(false);
+        }, "image/png");
+      };
+
+      // Load the background image
+      backgroundImg.src = "/backgrounds/background.png";
     } catch (err) {
       console.error("Failed to download image: ", err);
       alert("Failed to download image");
-    } finally {
       setDownloading(false);
     }
   };
@@ -117,7 +170,7 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
             >
               For {names.bride} & {names.groom}
             </h2>
-            <div className="w-24 h-1 bg-[#ECDFE4] mx-auto mt-2 mb-4 rounded-full"></div>
+            <div className="w-16 h-0.5 bg-[#ECDFE4] mx-auto mt-3 mb-6 rounded-full"></div>
           </div>
         )}
 
