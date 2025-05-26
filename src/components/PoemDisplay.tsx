@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import html2canvas from "html2canvas";
 import "./PoemDisplay.css";
 
 type PoemDisplayProps = {
@@ -9,24 +10,52 @@ type PoemDisplayProps = {
 };
 
 const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
-  const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const poemRef = useRef<HTMLDivElement>(null);
 
   if (!poem) return null;
 
-  const handleCopy = async () => {
-    if (!poem) return;
+  const handleDownloadImage = async () => {
+    if (!poemRef.current) return;
 
     try {
-      await navigator.clipboard.writeText(poem);
-      setCopied(true);
+      setDownloading(true);
 
-      // Reset copied state after 2 seconds
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
+      // Create canvas from the poem container
+      const canvas = await html2canvas(poemRef.current, {
+        useCORS: true,
+        allowTaint: false,
+      });
+
+      // Convert canvas to blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          // Create download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+
+          // Generate filename with names if available
+          const filename =
+            names && (names.bride || names.groom)
+              ? `poem-${names.bride.replace(/\s+/g, "-")}-${names.groom.replace(
+                  /\s+/g,
+                  "-"
+                )}.png`
+              : "wedding-poem.png";
+
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+      }, "image/png");
     } catch (err) {
-      console.error("Failed to copy text: ", err);
-      alert("Failed to copy to clipboard");
+      console.error("Failed to download image: ", err);
+      alert("Failed to download image");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -68,7 +97,18 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
         </p>
       </div>
 
-      <div className="bg-white bg-opacity-75 border-2 border-[#ECDFE4] rounded-[28px] p-6 mb-6 shadow-lg poem-container">
+      <div
+        className="bg-white bg-opacity-75 border-2 border-[#ECDFE4] rounded-[28px] p-8 mb-6 shadow-lg poem-container"
+        ref={poemRef}
+        style={{
+          padding: "2rem",
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
+          minHeight: "400px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
         {names && (names.bride || names.groom) && (
           <div className="mb-4 text-center">
             <h2
@@ -100,10 +140,10 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
 
       <div className="flex justify-center space-x-4">
         <button
-          onClick={handleCopy}
+          onClick={handleDownloadImage}
           className="px-3 py-2 bg-white border border-[#873053] text-[#873053] rounded-full text-sm font-medium flex items-center transition-colors cursor-pointer shadow-md hover:bg-[#f8f0f3]"
           type="button"
-          aria-label="Copy poem to clipboard"
+          aria-label="Download poem as image"
           style={{ fontFamily: "Cinzel, serif" }}
         >
           <svg
@@ -117,10 +157,10 @@ const PoemDisplay = ({ poem, onBack, onRestart, names }: PoemDisplayProps) => {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
             />
           </svg>
-          {copied ? "Copied!" : "Copy"}
+          {downloading ? "Downloading..." : "Download"}
         </button>
 
         <button
